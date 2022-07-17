@@ -1,0 +1,88 @@
+package ${package.Controller};
+
+import ${package.Entity}.${entity}DO;
+import ${package.Service}.${table.serviceName};
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Api;
+import cn.yungov.common.base.api.ApiResult;
+import cn.yungov.common.base.api.PageQuery;
+import cn.yungov.common.base.api.PageResult;
+import cn.yungov.common.base.validation.CreateGroup;
+import cn.yungov.common.base.validation.UpdateGroup;
+import org.springframework.validation.annotation.Validated;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+/**
+ * ${table.comment} 前端控制器
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+@Api(value = "${table.comment}", tags = "${table.comment}")
+#set($prefixIndex=${table.name.indexOf("_")}+1)
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/${table.name.substring($prefixIndex).replaceAll("_", "-")}")
+public class ${table.controllerName} {
+#set($serviceImpl=${table.serviceName.toLowerCase().substring(1,2)} + "" +${table.serviceName.substring(2)})
+#set($entityParam=${entity.toLowerCase().substring(0,1)} + "" +${entity.substring(1)})
+
+    private final ${table.serviceName} ${serviceImpl};
+
+    /**
+    * 查询列表 分页
+    * @param pageParam 分页参数
+    * @return ApiResult#PageResult<${entity}>
+    */
+    @ApiOperation(value = "分页列表")
+    @GetMapping("/list-page")
+    public ApiResult<PageResult<${entity}>> getListPage(PageQuery<${entity}> pageQuery) {
+        return ApiResult.ok(${serviceImpl}.queryPage(pageQuery));
+    }
+
+    /**
+     * 根据id获取信息
+     * @param id 数据id
+     * @return ${entity}
+     */
+    @ApiOperation(value = "根据Id获取信息")
+    @GetMapping(value = "{id}")
+    public ApiResult<${entity}> get(@PathVariable Long id) {
+        return ApiResult.ok(${serviceImpl}.getById(id));
+    }
+
+    /**
+     * 修改
+     * @param ${entityParam}
+     * @return ${entity}
+     */
+    @ApiOperation(value = "根据Id修改信息")
+    @PutMapping
+    public ApiResult<Boolean> update(@Validated(UpdateGroup.class) @RequestBody ${entity} ${entityParam}) {
+        return ApiResult.ok(${serviceImpl}.updateById(${entityParam}));
+    }
+
+    /**
+     * 新增
+     * @param ${entityParam}
+     * @return ${entity}
+     */
+    @ApiOperation(value = "新增信息")
+    @PostMapping
+    public ApiResult<Boolean> create(@Validated(CreateGroup.class) @RequestBody ${entity} ${entityParam}) {
+        return ApiResult.ok(${serviceImpl}.save(${entityParam}));
+    }
+
+    /**
+     * 删除
+     * @param id
+     * @return ${entity}
+     */
+    @ApiOperation(value = "根据Id删除信息")
+    @DeleteMapping("{id}")
+    public ApiResult<Boolean> delete(@PathVariable Long id) {
+        return ApiResult.ok(${serviceImpl}.removeById(id));
+    }
+
+}

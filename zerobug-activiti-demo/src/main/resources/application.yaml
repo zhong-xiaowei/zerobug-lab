@@ -1,1 +1,17 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.68.201:3306/activiti_demo?nullCatalogMeansCurrent=true&useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=CONVERT_TO_NULL?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=CONVERT_TO_NULL
+    username: root
+    password: ZXWzxw
+  activiti:
+    database-schema-update: true
+    history-level: full
+    check-process-definitions: false
 
+
+mybatis:
+  type-aliases-package: cn.com.zerobug.demo.activti.entity
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true

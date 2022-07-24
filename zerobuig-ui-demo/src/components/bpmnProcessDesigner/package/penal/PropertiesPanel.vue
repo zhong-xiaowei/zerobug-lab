@@ -56,12 +56,7 @@ import ElementProperties from "./properties/ElementProperties";
 import ElementForm from "./form/ElementForm";
 import UserTaskListeners from "./listeners/UserTaskListeners";
 import Log from "../Log";
-/**
- * 侧边栏
- * @Author MiyueFE
- * @Home https://github.com/miyuesc
- * @Date 2021年3月31日18:57:51
- */
+
 export default {
   name: "MyPropertiesPanel",
   components: {

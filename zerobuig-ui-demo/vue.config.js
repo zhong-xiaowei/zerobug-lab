@@ -5,18 +5,20 @@ function resolve(dir) {
 }
 
 module.exports = {
-    configureWebpack: {
-        devServer: {
-            proxy: {
-                '/api': {
-                    target: 'http://127.0.0.1:8080',
-                    changeOrigin: true,
-                    pathRewrite: {
-                        '^/api': '/'
-                    }
+    devServer: {
+        host: '0.0.0.0',
+        open: true,
+        proxy: {
+            [process.env.VUE_APP_BASE_API]: {
+                target: 'http://127.0.0.1:8080',
+                changeOrigin: true,
+                pathRewrite: {
+                    ['^' + process.env.VUE_APP_BASE_API]: ''
                 }
             }
-        },
+        }
+    },
+    configureWebpack: {
         resolve: {
             alias: {
                 '@': resolve('src')

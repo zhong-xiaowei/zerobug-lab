@@ -15,8 +15,8 @@ const routes = [
         component: ()=> import('@/views/bpmn/index')
     },
     {
-        path: '/bpmn/editor',
-        component: ()=> import('@/views/bpmn/editor')
+        path: '/bpmn/designer',
+        component: ()=> import('@/views/bpmn/designer')
     }
 ]
 

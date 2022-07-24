@@ -16,6 +16,7 @@
         @element-click="elementClick"
         @element-contextmenu="elementContextmenu"
         @init-finished="initModeler"
+        @save="saveDesign"
     >
     </my-process-designer>
     <my-properties-panel :key="`penal-${reloadIndex}`" :bpmn-modeler="modeler" :prefix="controlForm.prefix"
@@ -44,6 +45,7 @@ import minimapModule from "diagram-js-minimap";
 import UserSql from "@/components/bpmnProcessDesigner/src/modules/extension/user.json";
 import clickoutside from "element-ui/lib/utils/clickoutside";
 import RewriteAutoPlace from "@/components/bpmnProcessDesigner/src/modules/auto-place/rewriteAutoPlace";
+import {save} from "@/api/bpmn/designer"
 
 export default {
   name: "BpmnEditor",
@@ -65,7 +67,7 @@ export default {
         simulation: true,
         labelEditing: false,
         labelVisible: false,
-        prefix: "flowable",
+        prefix: "activiti",
         headerButtonSize: "mini",
         events: ["element.click", "element.contextmenu"],
         // additionalModel: []
@@ -83,10 +85,9 @@ export default {
       addis: {
         CustomContentPadProvider,
         CustomPaletteProvider
-      }
+      },
+      modelInfo: {}
     };
-  },
-  created() {
   },
   methods: {
     initModeler(modeler) {
@@ -144,6 +145,21 @@ export default {
       console.log(this.modeler);
       console.log(this.modeler.get("toggleMode"));
       this.modeler.get("toggleMode").toggleMode();
+    },
+    saveDesign(xml) {
+      const data = {
+        ...this.modelInfo,
+        xmlStr: xml
+      }
+      if (data.id) {
+        // 修改
+      } else {
+        // 新增
+        console.log(data)
+        save(data).then(res => {
+          console.log(res);
+        })
+      }
     }
   }
 }

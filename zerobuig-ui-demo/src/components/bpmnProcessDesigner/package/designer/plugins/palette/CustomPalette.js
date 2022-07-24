@@ -25,7 +25,7 @@ F.prototype.getPaletteEntries = function() {
     lassoTool = this._lassoTool,
     handTool = this._handTool,
     globalConnect = this._globalConnect,
-    moddle = this._moddle,
+    // moddle = this._moddle,
     translate = this._translate;
 
   function createAction(type, group, className, title, options) {

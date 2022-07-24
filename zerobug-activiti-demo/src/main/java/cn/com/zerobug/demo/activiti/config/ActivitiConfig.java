@@ -1,6 +1,11 @@
-package cn.com.zerobug.demo.activiti.config;/**
- * @author  zhongxiaowei
+package cn.com.zerobug.demo.activiti.config;
+
+/**
+ * @author zhongxiaowei
  * @contact zhongxiaowei.nice@gmail.com
- * @date  2022/7/19
- */public class ActivitiConfig {
+ * @date 2022/7/19
+ */
+public class ActivitiConfig {
+
+
 }

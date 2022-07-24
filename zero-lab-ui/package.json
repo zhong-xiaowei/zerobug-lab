@@ -1,0 +1,55 @@
+{
+  "name": "zero-lab-ui",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "bpmn-js-sketchy": "^0.5.3",
+    "bpmn-js-task-resize": "^1.2.0",
+    "bpmn-js-token-simulation": "0.10.0",
+    "core-js": "^3.6.5",
+    "diagram-js-minimap": "^2.0.4",
+    "highlight.js": "^10.5.0",
+    "element-ui": "^2.15.9",
+    "sass": "^1.30.0",
+    "sass-loader": "^8.0.2",
+    "vue": "^2.6.11",
+    "vue-router": "^3.5.1",
+    "x2js": "^3.4.2",
+    "xml-js": "^1.6.11"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.5.15",
+    "@vue/cli-plugin-eslint": "~4.5.15",
+    "@vue/cli-service": "~4.5.15",
+    "babel-eslint": "^10.1.0",
+    "bpmn-js": "^8.8.3",
+    "bpmn-js-properties-panel": "^0.37.2",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^6.2.2",
+    "vue-template-compiler": "^2.6.11"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {}
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

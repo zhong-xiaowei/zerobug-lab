@@ -1,4 +1,4 @@
-# zero-lab-ui
+# zerobug-ui-demo
 
 ## Project setup
 ```

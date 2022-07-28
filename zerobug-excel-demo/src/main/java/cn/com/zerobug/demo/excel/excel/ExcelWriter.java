@@ -1,13 +1,12 @@
 package cn.com.zerobug.demo.excel.excel;
 
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author zhongxiaowei
@@ -19,7 +18,7 @@ public class ExcelWriter<T> {
     private Workbook workbook;
     private Sheet[] sheets;
     private int sheetCursor;
-    private Class<T> classType;
+    private Class<T>                    classType;
     private List<ExcelColumnDefinition> columnDefinitions;
 
     /**
@@ -80,7 +79,7 @@ public class ExcelWriter<T> {
      */
     public ExcelWriter<T> write(List<T> datas) {
         for (int i = 0; i < datas.size(); i++) {
-            T t = datas.get(i);
+            T   t   = datas.get(i);
             Row row = this.sheets[sheetCursor].createRow(i + 1);
             for (int j = 0; j < columnDefinitions.size(); j++) {
                 ExcelColumnDefinition definition = columnDefinitions.get(j);
@@ -109,7 +108,7 @@ public class ExcelWriter<T> {
      * @param sheet sheet
      */
     private void buildHeader(Sheet sheet) {
-        Row row = sheet.createRow(0);
+        Row       row             = sheet.createRow(0);
         CellStyle headerCellStyle = this.workbook.createCellStyle();
         headerCellStyle.setAlignment(HorizontalAlignment.CENTER);
         headerCellStyle.setVerticalAlignment(VerticalAlignment.CENTER);

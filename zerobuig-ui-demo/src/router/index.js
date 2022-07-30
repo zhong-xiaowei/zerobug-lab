@@ -17,6 +17,10 @@ const routes = [
     {
         path: '/bpmn/designer',
         component: ()=> import('@/views/bpmn/designer')
+    },
+    {
+        path: '/captcha',
+        component: ()=> import('@/views/captcha/index')
     }
 ]
 

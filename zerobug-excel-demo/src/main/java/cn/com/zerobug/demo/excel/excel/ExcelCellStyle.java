@@ -16,6 +16,6 @@ public @interface ExcelCellStyle {
 
     String fontHeightInPoints() default "10";
 
-    String dataFormat() default "yyyy/MM/dd";
+    String dataFormat() default "";
 
 }

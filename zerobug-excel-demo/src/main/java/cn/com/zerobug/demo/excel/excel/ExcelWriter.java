@@ -1,12 +1,18 @@
 package cn.com.zerobug.demo.excel.excel;
 
+import cn.com.zerobug.demo.excel.model.ColumnProperty;
+import cn.com.zerobug.demo.excel.model.ColumnStyle;
+import cn.com.zerobug.demo.excel.model.ExcelDefinition;
+import cn.com.zerobug.demo.excel.utils.ExcelUtil;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.date.DateUtil;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -14,99 +20,71 @@ import java.util.*;
  * @contact zhongxiaowei.nice@gmail.com
  * @date 2022/7/26
  */
-public class ExcelWriter<T> extends ExcelHandler<T> {
+public class ExcelWriter {
 
-    public static final Integer DEFAULT_WORKBOOK = 1;
+    private ExcelDefinition excelDefinition;
+    private Workbook workbook;
+    private String sheetName;
+    private boolean init = false;
 
-    private ExcelSheet excelSheet;
-    private int sheetCursor;
-    private List<ExcelColumnDefinition> columnDefinitions;
-
-    public ExcelWriter(Class<T> classType) {
-        this(classType, DEFAULT_WORKBOOK);
+    public ExcelWriter(ExcelDefinition excelDefinition, Workbook workbook) {
+        this.excelDefinition = excelDefinition;
+        this.workbook = workbook;
     }
 
-    public ExcelWriter(Class<T> classType, Integer type) {
-        super(classType);
-        if (DEFAULT_WORKBOOK.equals(type)) {
-            setWorkbook(new XSSFWorkbook());
-        }
-        registerExcelColumnDefinition();
-
-    }
-
-    /**
-     * 创建或获取sheet
-     * 默认为上一次操作的sheet
-     * 如果第一次则为0
-     *
-     * @return ExcelWriter
-     */
-    public ExcelWriter<T> sheet() {
-        return sheet(null);
-    }
-
-    /**
-     * 创建或获取sheet 根据游标选择
-     *
-     * @param sheetName
-     * @return
-     */
-    public ExcelWriter<T> sheet(String sheetName) {
-        this.excelSheet = new ExcelSheet(this, 0, null, 1, null);
+    public ExcelWriter sheet(String sheetName) {
+        this.initSheetHeader(sheetName);
+        this.sheetName = sheetName;
+        this.init = true;
         return this;
     }
 
-
-    /**
-     * 数据来源
-     *
-     * @param datas 数据集合
-     * @return ExcelWriter
-     */
-    public ExcelWriter<T> from(List<T> datas) {
-        for (int i = 0; i < datas.size(); i++) {
-            T t = datas.get(i);
-            Row row = excelSheet.getSheet().createRow(i + 1);
-            for (int j = 0; j < columnDefinitions.size(); j++) {
-                ExcelColumnDefinition definition = columnDefinitions.get(j);
-                setCellValue(row.createCell(j), t, definition);
+    public Workbook write(List<?> data) {
+        if (init) {
+            if (!CollectionUtils.isEmpty(data)) {
+                Sheet sheet = workbook.getSheet(sheetName);
+                List<ColumnProperty> columns = this.excelDefinition.getColumns();
+                for (int i = 0; i < data.size(); i++) {
+                    Row row = ExcelUtil.newRow(sheet, i + 1);
+                    for (int j = 0; j < columns.size(); j++) {
+                        this.setCellValue(ExcelUtil.newCell(row, j), data.get(i), columns.get(j));
+                    }
+                }
             }
         }
-        return this;
+        return workbook;
     }
 
-    /**
-     * 数据写入
-     *
-     * @param outputStream
-     */
-    public void doWrite(OutputStream outputStream) throws IOException {
+    public void toStream(OutputStream outputStream) {
         try {
-            getWorkbook().write(outputStream);
+            this.workbook.write(outputStream);
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
-            close();
+            try {
+                this.workbook.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
-    /**
-     * 关闭工作簿
-     *
-     * @throws IOException
-     */
-    public void close() throws IOException {
-        getWorkbook().close();
+    private void initSheetHeader(String sheetName) {
+        Sheet sheet = ExcelUtil.newSheet(workbook, sheetName);
+        Row headerRow = ExcelUtil.newRow(sheet, 0);
+        List<ColumnProperty> columns = excelDefinition.getColumns();
+        for (int i = 0; i < columns.size(); i++) {
+            ColumnProperty columnProperty = columns.get(i);
+            ColumnStyle columnStyle = columnProperty.getColumnStyle();
+            this.setCellWidth(sheet, i, columnStyle.getWidth(), columnProperty.getName());
+            Cell cell = headerRow.createCell(i);
+            cell.setCellStyle(getHeaderCellStyle());
+            cell.setCellValue(columnProperty.getName());
+        }
     }
 
-    /**
-     * 构建表头
-     */
-    public ExcelWriter<T> buildHeader() {
-        Sheet sheet = excelSheet.getSheet();
-        Row row = sheet.createRow(0);
-        CellStyle headerCellStyle = getWorkbook().createCellStyle();
+    private CellStyle getHeaderCellStyle() {
+        CellStyle headerCellStyle = this.workbook.createCellStyle();
         headerCellStyle.setAlignment(HorizontalAlignment.CENTER);
         headerCellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
         headerCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
@@ -115,112 +93,37 @@ public class ExcelWriter<T> extends ExcelHandler<T> {
         headerCellStyle.setBorderLeft(BorderStyle.THIN);
         headerCellStyle.setBorderRight(BorderStyle.THIN);
         headerCellStyle.setBorderTop(BorderStyle.THIN);
-        Font titleFont = getWorkbook().createFont();
+        Font titleFont = this.workbook.createFont();
         titleFont.setFontName("Arial");
         titleFont.setFontHeightInPoints((short) 14);
         titleFont.setBold(true);
         headerCellStyle.setFont(titleFont);
-
-        for (int i = 0; i < columnDefinitions.size(); i++) {
-            Cell cell = row.createCell(i);
-            cell.setCellValue(columnDefinitions.get(i).getName());
-            cell.setCellStyle(headerCellStyle);
-            sheet.setColumnWidth(i, sheet.getColumnWidth(i) * 18 / 9);
-        }
-        return this;
+        return headerCellStyle;
     }
 
-    /**
-     * 设置单元 值
-     *
-     * @param cell       单元
-     * @param t          数据类型
-     * @param definition 字段定义
-     */
-    private void setCellValue(Cell cell, T t, ExcelColumnDefinition definition) {
-        try {
-            DataFormat dataFormat = getWorkbook().createDataFormat();
-            CellStyle cellStyle = definition.getCellStyle();
-            Object value = definition.getValue(t);
-            if (value instanceof String) {
-                cell.setCellValue((String) value);
-            } else if (value instanceof Boolean) {
-                cell.setCellValue((Boolean) value);
-            } else if (value instanceof Integer) {
-                cell.setCellValue((Integer) value);
-            } else if (value instanceof Double) {
-                cell.setCellValue((Double) value);
-            } else if (value instanceof Date) {
-                String builtinFormat = BuiltinFormats.getBuiltinFormat(14);
-                short format = dataFormat.getFormat(builtinFormat);
-                cellStyle.setDataFormat(format);
-                cell.setCellValue((Date) value);
+    private void setCellWidth(Sheet sheet, int index, Short width, String name) {
+        if (width == 0 && StringUtils.hasLength(name)) {
+            sheet.setColumnWidth(index, (short) (name.length() * 2000));
+        } else {
+            width = width == 0 ? 150 : width;
+            sheet.setColumnWidth(index, (short) (width * 35));
+        }
+    }
+
+    private void setCellValue(Cell cell, Object entity, ColumnProperty columnProperty) {
+        Object value = BeanUtil.getFieldValue(entity, columnProperty.getFieldName());
+        if (null != value) {
+            ColumnStyle columnStyle = columnProperty.getColumnStyle();
+            String dataFormat = columnStyle.getDataFormat();
+            if (StringUtils.hasLength(dataFormat)) {
+                if (value instanceof Date) {
+                    cell.setCellValue(DateUtil.format((Date) value, dataFormat));
+                    return;
+                }
+                // TODO ...更多格式处理
             }
-            cell.setCellStyle(definition.getCellStyle());
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+            cell.setCellValue(Convert.toStr(value));
         }
-    }
-
-    /**
-     * 注册Excel 的字段定义，用于后期的写入
-     */
-    private void registerExcelColumnDefinition() {
-        Field[] fields = getClassType().getDeclaredFields();
-        this.columnDefinitions = new ArrayList<>(fields.length);
-        for (Field field : fields) {
-            field.setAccessible(true);
-            ExcelColumnDefinition excelColumnDefinition = new ExcelColumnDefinition();
-            excelColumnDefinition.setField(field);
-            ExcelCell excelCell = field.getAnnotation(ExcelCell.class);
-            if (excelCell != null) {
-                excelColumnDefinition.setName(excelCell.name());
-            }
-            ExcelCellStyle excelCellStyle = field.getAnnotation(ExcelCellStyle.class);
-            CellStyle cellStyle = getWorkbook().createCellStyle();
-            Font font = getWorkbook().createFont();
-            if (excelCellStyle != null) {
-                setCustomStyle(excelCellStyle, cellStyle, font);
-            } else {
-                // 默认样式
-                setDefualtStyle(cellStyle, font);
-            }
-            excelColumnDefinition.setCellStyle(cellStyle);
-            columnDefinitions.add(excelColumnDefinition);
-        }
-    }
-
-    private void setCustomStyle(ExcelCellStyle excelCellStyle, CellStyle cellStyle, Font font) {
-        // 自定义样式，等待完善
-        font.setFontName(excelCellStyle.fontName());
-        font.setFontHeightInPoints(Short.valueOf(excelCellStyle.fontHeightInPoints()));
-        cellStyle.setFont(font);
-        if (!excelCellStyle.dataFormat().isEmpty()) {
-            short format = getWorkbook().createDataFormat().getFormat(excelCellStyle.dataFormat());
-            cellStyle.setDataFormat(format);
-        }
-    }
-
-    /**
-     * 设置默认的 数据单元样式
-     *
-     * @param cellStyle
-     * @param font
-     */
-    private void setDefualtStyle(CellStyle cellStyle, Font font) {
-        cellStyle.setAlignment(HorizontalAlignment.CENTER);
-        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-        cellStyle.setBorderRight(BorderStyle.THIN);
-        cellStyle.setRightBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
-        cellStyle.setBorderLeft(BorderStyle.THIN);
-        cellStyle.setLeftBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
-        cellStyle.setBorderTop(BorderStyle.THIN);
-        cellStyle.setTopBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
-        cellStyle.setBorderBottom(BorderStyle.THIN);
-        cellStyle.setBottomBorderColor(IndexedColors.GREY_50_PERCENT.getIndex());
-        font.setFontName("Arial");
-        font.setFontHeightInPoints((short) 10);
-        cellStyle.setFont(font);
     }
 
 }

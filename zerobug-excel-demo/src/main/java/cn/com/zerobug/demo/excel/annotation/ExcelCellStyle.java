@@ -1,4 +1,4 @@
-package cn.com.zerobug.demo.excel.excel;
+package cn.com.zerobug.demo.excel.annotation;
 
 import java.lang.annotation.*;
 
@@ -17,5 +17,7 @@ public @interface ExcelCellStyle {
     String fontHeightInPoints() default "10";
 
     String dataFormat() default "";
+
+    short width() default 0;
 
 }

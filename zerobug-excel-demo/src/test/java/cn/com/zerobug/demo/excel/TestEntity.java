@@ -1,7 +1,9 @@
 package cn.com.zerobug.demo.excel;
 
-import cn.com.zerobug.demo.excel.excel.ExcelCell;
+import cn.com.zerobug.demo.excel.annotation.ExcelCellStyle;
+import cn.com.zerobug.demo.excel.annotation.ExcelColumn;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -11,16 +13,37 @@ import java.util.Date;
  */
 public class TestEntity {
 
-    @ExcelCell(name = "用户名")
+    @ExcelColumn(name = "用户名")
     private String userName;
-    @ExcelCell(name = "年龄")
+    @ExcelColumn(name = "年龄")
     private Integer age;
-    @ExcelCell(name = "性别")
+    @ExcelColumn(name = "int")
+    private int intValue;
+    @ExcelColumn(name = "性别")
     private String gender;
-    @ExcelCell(name = "生日")
+    @ExcelColumn(name = "生日")
+    @ExcelCellStyle(dataFormat = "yyyy-MM-dd")
     private Date birthday;
-    @ExcelCell(name = "钱")
+    @ExcelColumn(name = "钱")
     private Double money;
+    @ExcelColumn(name = "钱2")
+    private BigDecimal money2;
+
+    public int getIntValue() {
+        return intValue;
+    }
+
+    public void setIntValue(int intValue) {
+        this.intValue = intValue;
+    }
+
+    public BigDecimal getMoney2() {
+        return money2;
+    }
+
+    public void setMoney2(BigDecimal money2) {
+        this.money2 = money2;
+    }
 
     public Date getBirthday() {
         return birthday;

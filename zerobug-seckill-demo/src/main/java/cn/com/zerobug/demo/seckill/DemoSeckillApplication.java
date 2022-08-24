@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@MapperScan(value = "cool.zyc.demo.seckill.mapper")
+@MapperScan(value = "cn.com.zerobug.demo.seckill.mapper")
 public class DemoSeckillApplication {
 
     public static void main(String[] args) {

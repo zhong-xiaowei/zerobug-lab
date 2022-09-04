@@ -1,8 +1,7 @@
 package cn.com.zerobug.demo.activiti.controller;
 
 import cn.com.zerobug.demo.activiti.service.ProcessDesignerService;
-import cn.com.zerobug.demo.activiti.vo.ProcessModelSaveVo;
-import org.springframework.beans.factory.annotation.Autowired;
+import cn.com.zerobug.demo.activiti.vo.ProcessModelSaveReqVo;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -19,15 +18,15 @@ public class ProcessDesignerController {
     @Resource
     private ProcessDesignerService processDesignerService;
 
-    @GetMapping("/test")
-    public boolean test() {
+    @PostMapping("/save")
+    public boolean save(@RequestBody ProcessModelSaveReqVo processModelSaveReqVo) {
+        processDesignerService.saveModelXml(processModelSaveReqVo);
         return true;
     }
 
-    @PostMapping("/save")
-    public boolean save(@RequestBody ProcessModelSaveVo processModelSaveVo) {
-        processDesignerService.saveModelXml(processModelSaveVo);
-        return true;
+    @GetMapping("/readXml/{modelId}")
+    public String readXml(@PathVariable(value = "modelId") String modelId) {
+        return processDesignerService.readXml(modelId);
     }
 
 }

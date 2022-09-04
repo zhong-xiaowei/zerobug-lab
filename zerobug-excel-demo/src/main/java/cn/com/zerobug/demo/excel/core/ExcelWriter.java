@@ -1,5 +1,6 @@
-package cn.com.zerobug.demo.excel.excel;
+package cn.com.zerobug.demo.excel.core;
 
+import cn.com.zerobug.demo.excel.exception.NoInitializationException;
 import cn.com.zerobug.demo.excel.model.ColumnProperty;
 import cn.com.zerobug.demo.excel.model.ColumnStyle;
 import cn.com.zerobug.demo.excel.model.ExcelDefinition;
@@ -7,25 +8,24 @@ import cn.com.zerobug.demo.excel.utils.ExcelUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.lang.Assert;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.*;
 
 /**
  * @author zhongxiaowei
  * @contact zhongxiaowei.nice@gmail.com
- * @date 2022/7/26
+ * @date 2022/8/26
  */
 public class ExcelWriter {
 
     private ExcelDefinition excelDefinition;
     private Workbook workbook;
     private String sheetName;
-    private boolean init = false;
+    private boolean writable = false;
 
     public ExcelWriter(ExcelDefinition excelDefinition, Workbook workbook) {
         this.excelDefinition = excelDefinition;
@@ -33,40 +33,26 @@ public class ExcelWriter {
     }
 
     public ExcelWriter sheet(String sheetName) {
-        this.initSheetHeader(sheetName);
         this.sheetName = sheetName;
-        this.init = true;
+        this.initSheetHeader(sheetName);
+        this.writable = true;
         return this;
     }
 
     public Workbook write(List<?> data) {
-        if (init) {
-            if (!CollectionUtils.isEmpty(data)) {
-                Sheet sheet = workbook.getSheet(sheetName);
-                List<ColumnProperty> columns = this.excelDefinition.getColumns();
-                for (int i = 0; i < data.size(); i++) {
-                    Row row = ExcelUtil.newRow(sheet, i + 1);
-                    for (int j = 0; j < columns.size(); j++) {
-                        this.setCellValue(ExcelUtil.newCell(row, j), data.get(i), columns.get(j));
-                    }
+        Assert.isTrue(writable, () -> new NoInitializationException("未进行初始化，请初始化完成后执行"));
+        if (!CollectionUtils.isEmpty(data)) {
+            Sheet sheet = workbook.getSheet(sheetName);
+            List<ColumnProperty> columns = this.excelDefinition.getColumns();
+            for (int i = 0; i < data.size(); i++) {
+                Row row = ExcelUtil.newRow(sheet, i + 1);
+                for (int j = 0; j < columns.size(); j++) {
+                    this.setCellValue(ExcelUtil.newCell(row, j), data.get(i), columns.get(j));
                 }
             }
         }
-        return workbook;
-    }
 
-    public void toStream(OutputStream outputStream) {
-        try {
-            this.workbook.write(outputStream);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            try {
-                this.workbook.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        return workbook;
     }
 
     private void initSheetHeader(String sheetName) {

@@ -2,11 +2,13 @@ package cn.com.zerobug.demo.activiti.service.impl;
 
 import cn.com.zerobug.demo.activiti.extend.cmd.SaveModelDesignerCommand;
 import cn.com.zerobug.demo.activiti.service.ProcessDesignerService;
-import cn.com.zerobug.demo.activiti.vo.ProcessModelSaveVo;
+import cn.com.zerobug.demo.activiti.vo.ProcessModelSaveReqVo;
 import org.activiti.engine.ManagementService;
+import org.activiti.engine.RepositoryService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author zhongxiaowei
@@ -16,11 +18,19 @@ import javax.annotation.Resource;
 @Service
 public class ProcessDesignerServiceImpl implements ProcessDesignerService {
 
-    @Resource
+    @Autowired
     protected ManagementService managementService;
+    @Autowired
+    protected RepositoryService repositoryService;
 
     @Override
-    public void saveModelXml(ProcessModelSaveVo processModelSaveVo) {
-        managementService.executeCommand(new SaveModelDesignerCommand(processModelSaveVo.getId(), processModelSaveVo.getXmlStr()));
+    public void saveModelXml(ProcessModelSaveReqVo processModelSaveReqVo) {
+        managementService.executeCommand(new SaveModelDesignerCommand(processModelSaveReqVo.getId(), processModelSaveReqVo.getXmlStr()));
+    }
+
+    @Override
+    public String readXml(String modelId) {
+        byte[] editorBytes = repositoryService.getModelEditorSource(modelId);
+        return new String(editorBytes, StandardCharsets.UTF_8);
     }
 }

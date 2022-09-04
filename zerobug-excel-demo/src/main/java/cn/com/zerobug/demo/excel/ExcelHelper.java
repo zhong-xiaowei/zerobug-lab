@@ -1,12 +1,12 @@
 package cn.com.zerobug.demo.excel;
 
-import cn.com.zerobug.demo.excel.excel.ExcelWriter;
+import cn.com.zerobug.demo.excel.core.ExcelWriter;
 import cn.com.zerobug.demo.excel.factory.ExcelDefinitionFactory;
 import cn.com.zerobug.demo.excel.model.ExcelDefinition;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
-import javax.xml.crypto.Data;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
@@ -17,13 +17,23 @@ import java.util.List;
  */
 public class ExcelHelper {
 
-    public static void writeStream(Class<?> clazz,
-                                   String sheetName,
-                                   List<?> data, OutputStream outputStream) {
+    public static Workbook generateWorkbook(Class<?> clazz, String sheetName, List<?> data) {
         ExcelDefinition excelDefinition = ExcelDefinitionFactory.load(clazz);
-        ExcelWriter excelWriter = new ExcelWriter(excelDefinition, new SXSSFWorkbook());
-        excelWriter.sheet(sheetName).write(data);
-        excelWriter.toStream(outputStream);
+        return new ExcelWriter(excelDefinition, new SXSSFWorkbook()).sheet(sheetName).write(data);
+    }
+
+    public static void writeStream(Workbook workbook, OutputStream outputStream) {
+        try {
+            workbook.write(outputStream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }finally {
+            try {
+                workbook.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
 }

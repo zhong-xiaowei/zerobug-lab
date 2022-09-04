@@ -7,10 +7,6 @@
 //import org.springframework.util.StringUtils;
 //
 //import java.io.InputStream;
-//import java.lang.reflect.Field;
-//import java.math.BigDecimal;
-//import java.text.ParseException;
-//import java.text.SimpleDateFormat;
 //import java.util.*;
 //
 //
@@ -19,19 +15,19 @@
 // * @contact zhongxiaowei.nice@gmail.com
 // * @date 2022/7/31
 // */
-//public class ExcelReader<T> extends ExcelHandler<T> {
+//public class ExcelReader1<T> extends ExcelHandler<T> {
 //
-//    private static final Logger LOGGER = LoggerFactory.getLogger(ExcelReader.class);
+//    private static final Logger LOGGER = LoggerFactory.getLogger(ExcelReader1.class);
 //
 //    private InputStream inputStream;
 //    private ExcelSheet excelSheet;
 //    private int headerRows;
 //
-//    public ExcelReader(Class<T> classType) {
+//    public ExcelReader1(Class<T> classType) {
 //        super(classType, READ_MODE);
 //    }
 //
-//    public ExcelReader<T> from(InputStream is) {
+//    public ExcelReader1<T> from(InputStream is) {
 //        try {
 //            this.inputStream = is;
 //            setWorkbook(WorkbookFactory.create(is));
@@ -42,12 +38,12 @@
 //        return this;
 //    }
 //
-//    public ExcelReader<T> sheet(int headerRows) {
+//    public ExcelReader1<T> sheet(int headerRows) {
 //        sheet(null, headerRows);
 //        return this;
 //    }
 //
-//    public ExcelReader<T> sheet(String sheetName, int headerRows) {
+//    public ExcelReader1<T> sheet(String sheetName, int headerRows) {
 //        Sheet sheet = null;
 //        if (StringUtils.hasText(sheetName)) {
 //            sheet = getWorkbook().getSheet(sheetName);
@@ -59,7 +55,7 @@
 //        return this;
 //    }
 //
-//    public ExcelReader<T> parseFields() {
+//    public ExcelReader1<T> parseFields() {
 ////        this.fields = getClassType().getDeclaredFields();
 ////        for (int i = 0; i < fields.length; i++) {
 ////            Field field = fields[i];

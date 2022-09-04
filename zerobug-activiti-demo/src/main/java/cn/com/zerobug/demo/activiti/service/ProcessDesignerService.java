@@ -1,6 +1,6 @@
 package cn.com.zerobug.demo.activiti.service;
 
-import cn.com.zerobug.demo.activiti.vo.ProcessModelSaveVo;
+import cn.com.zerobug.demo.activiti.vo.ProcessModelSaveReqVo;
 
 /**
  * @author zhongxiaowei
@@ -9,10 +9,7 @@ import cn.com.zerobug.demo.activiti.vo.ProcessModelSaveVo;
  */
 public interface ProcessDesignerService {
 
-    /**
-     * 保存模型 XML
-     * @param processModelSaveVo
-     */
-    void saveModelXml(ProcessModelSaveVo processModelSaveVo);
+    void saveModelXml(ProcessModelSaveReqVo processModelSaveReqVo);
 
+    String readXml(String modelId);
 }

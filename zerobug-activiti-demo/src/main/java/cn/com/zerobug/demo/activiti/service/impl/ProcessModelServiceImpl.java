@@ -2,10 +2,11 @@ package cn.com.zerobug.demo.activiti.service.impl;
 
 import cn.com.zerobug.demo.activiti.service.ProcessModelService;
 import cn.com.zerobug.demo.activiti.utils.JacksonUtil;
-import cn.com.zerobug.demo.activiti.vo.ProcessModelResVo;
+import cn.com.zerobug.demo.activiti.vo.response.ProcessModelResponseVo;
 import cn.com.zerobug.demo.activiti.vo.query.ProcessModelQueryVo;
 import cn.hutool.core.lang.Assert;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -32,17 +33,19 @@ public class ProcessModelServiceImpl implements ProcessModelService {
     private RepositoryService repositoryService;
 
     @Override
-    public List<ProcessModelResVo> queryModelList(ProcessModelQueryVo processModelQueryVo) {
+    public List<ProcessModelResponseVo> queryModelList(ProcessModelQueryVo processModelQueryVo) {
         ModelQuery modelQuery = repositoryService.createModelQuery();
         buildQueryParams(processModelQueryVo, modelQuery);
         // TODO 暂时写死
         List<Model> models = modelQuery.listPage(0, 10);
         return models.stream().map(model -> {
-            ProcessModelResVo response = new ProcessModelResVo();
+            ProcessModelResponseVo response = new ProcessModelResponseVo();
             BeanUtils.copyProperties(model, response);
             try {
                 JsonNode modelNode = JacksonUtil.getObjectMapper().readTree(model.getMetaInfo());
                 response.setDescription(modelNode.get("description").asText());
+            } catch (JsonMappingException e) {
+                throw new RuntimeException(e);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
@@ -52,26 +55,34 @@ public class ProcessModelServiceImpl implements ProcessModelService {
     }
 
     @Override
-    public boolean saveModel(ProcessModelResVo processModelResVo) {
-        long countNum = repositoryService.createModelQuery().modelKey(processModelResVo.getKey()).count();
+    public boolean saveModel(ProcessModelResponseVo processModelResponseVo) {
+        long countNum = repositoryService.createModelQuery().modelKey(processModelResponseVo.getKey()).count();
         Assert.isTrue(countNum == 0, "模型已存在");
-        String metaInfo = getMetaInfo(processModelResVo);
+        String metaInfo = getMetaInfo(processModelResponseVo);
         Model model = repositoryService.newModel();
-        model.setKey(processModelResVo.getKey());
-        model.setName(processModelResVo.getName());
+        model.setKey(processModelResponseVo.getKey());
+        model.setName(processModelResponseVo.getName());
         model.setVersion(1);
         model.setMetaInfo(metaInfo);
-        model.setTenantId(processModelResVo.getTenantId());
-        model.setCategory(processModelResVo.getCategory());
+        model.setTenantId(processModelResponseVo.getTenantId());
+        model.setCategory(processModelResponseVo.getCategory());
         repositoryService.saveModel(model);
         return true;
     }
 
-    private String getMetaInfo(ProcessModelResVo processModelResVo) {
+    @Override
+    public ProcessModelResponseVo getById(String modelId) {
+        Model model = repositoryService.getModel(modelId);
+        ProcessModelResponseVo processModelResponseVo = new ProcessModelResponseVo();
+        BeanUtils.copyProperties(model, processModelResponseVo);
+        return processModelResponseVo;
+    }
+
+    private String getMetaInfo(ProcessModelResponseVo processModelResponseVo) {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode metaInfo = objectMapper.createObjectNode();
-        metaInfo.put("name", processModelResVo.getName());
-        metaInfo.put("description", processModelResVo.getDescription());
+        metaInfo.put("name", processModelResponseVo.getName());
+        metaInfo.put("description", processModelResponseVo.getDescription());
         return metaInfo.toString();
     }
 

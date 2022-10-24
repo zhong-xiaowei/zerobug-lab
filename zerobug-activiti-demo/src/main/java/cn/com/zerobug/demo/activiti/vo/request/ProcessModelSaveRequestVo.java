@@ -1,4 +1,4 @@
-package cn.com.zerobug.demo.activiti.vo;
+package cn.com.zerobug.demo.activiti.vo.request;
 
 import lombok.Data;
 
@@ -8,7 +8,7 @@ import lombok.Data;
  * @date 2022/7/24
  */
 @Data
-public class ProcessModelSaveReqVo {
+public class ProcessModelSaveRequestVo {
 
     private String id;
     private String xmlStr;

@@ -1,7 +1,7 @@
 package cn.com.zerobug.demo.activiti.controller;
 
 import cn.com.zerobug.demo.activiti.service.ProcessModelService;
-import cn.com.zerobug.demo.activiti.vo.ProcessModelResVo;
+import cn.com.zerobug.demo.activiti.vo.response.ProcessModelResponseVo;
 import cn.com.zerobug.demo.activiti.vo.query.ProcessModelQueryVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,13 +26,18 @@ public class ProcessModelController {
     private ProcessModelService processModelService;
 
     @GetMapping("/list-page")
-    public List<ProcessModelResVo> listPage(ProcessModelQueryVo model) {
+    public List<ProcessModelResponseVo> listPage(ProcessModelQueryVo model) {
         return processModelService.queryModelList(model);
     }
 
+    @GetMapping("/{modelId}")
+    public ProcessModelResponseVo getModel(@PathVariable String modelId) {
+        return processModelService.getById(modelId);
+    }
+
     @PostMapping("/save")
-    public boolean save(@RequestBody ProcessModelResVo processModelResVo) {
-        return processModelService.saveModel(processModelResVo);
+    public boolean save(@RequestBody ProcessModelResponseVo processModelResponseVo) {
+        return processModelService.saveModel(processModelResponseVo);
     }
 
 }

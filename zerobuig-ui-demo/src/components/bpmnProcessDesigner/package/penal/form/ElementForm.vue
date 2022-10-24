@@ -173,6 +173,7 @@ export default {
         enum: "枚举类",
         custom: "自定义类型"
       },
+      formDataKey: this.prefix === 'activiti'? 'FormProperty':'FormData',
       formFieldIndex: -1, // 编辑中的字段， -1 为新增
       formFieldOptionIndex: -1, // 编辑中的字段配置项， -1 为新增
       fieldModelVisible: false,
@@ -200,15 +201,14 @@ export default {
       this.elExtensionElements =
         this.bpmnElement.businessObject.get("extensionElements") || window.bpmnInstances.moddle.create("bpmn:ExtensionElements", { values: [] });
       // 获取元素表单配置 或者 创建新的表单配置
-      this.formData =
-        this.elExtensionElements.values.filter(ex => ex.$type === `${this.prefix}:FormData`)?.[0] ||
-        window.bpmnInstances.moddle.create(`${this.prefix}:FormData`, { fields: [] });
-
+      console.log(this.formDataKey);
+        this.formData =this.elExtensionElements.values.filter(ex => ex.$type === `${this.prefix}:${this.formDataKey}`)?.[0] ||
+        window.bpmnInstances.moddle.create(`${this.prefix}:${this.formDataKey}`, { fields: [] });
       // 业务标识 businessKey， 绑定在 formData 中
       this.businessKey = this.formData.businessKey;
 
       // 保留剩余扩展元素，便于后面更新该元素对应属性
-      this.otherExtensions = this.elExtensionElements.values.filter(ex => ex.$type !== `${this.prefix}:FormData`);
+      this.otherExtensions = this.elExtensionElements.values.filter(ex => ex.$type !== `${this.prefix}:${this.formDataKey}`);
 
       // 复制原始值，填充表格
       this.fieldList = JSON.parse(JSON.stringify(this.formData.fields || []));

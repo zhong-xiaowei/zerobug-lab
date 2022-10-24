@@ -1,4 +1,4 @@
-package cn.com.zerobug.demo.activiti.vo;
+package cn.com.zerobug.demo.activiti.vo.response;
 
 import java.util.Date;
 
@@ -7,7 +7,7 @@ import java.util.Date;
  * @contact zhongxiaowei.nice@gmail.com
  * @date 2022/9/1
  */
-public class ProcessModelResVo {
+public class ProcessModelResponseVo {
 
     private String id;
     private String name;

@@ -7,6 +7,7 @@ function resolve(dir) {
 module.exports = {
     devServer: {
         host: '0.0.0.0',
+        port: 10000,
         open: true,
         proxy: {
             [process.env.VUE_APP_BASE_API]: {

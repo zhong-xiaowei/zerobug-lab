@@ -19,8 +19,7 @@
         @save="saveDesign"
     >
     </my-process-designer>
-    <my-properties-panel :key="`penal-${reloadIndex}`" :bpmn-modeler="modeler" :prefix="controlForm.prefix"
-                         class="process-panel"/>
+    <my-properties-panel :key="`penal-${reloadIndex}`" :bpmn-modeler="modeler" :prefix="controlForm.prefix" class="process-panel" :modelInfo="modelInfo"/>
 
   </div>
 </template>
@@ -45,7 +44,8 @@ import minimapModule from "diagram-js-minimap";
 import UserSql from "@/components/bpmnProcessDesigner/src/modules/extension/user.json";
 import clickoutside from "element-ui/lib/utils/clickoutside";
 import RewriteAutoPlace from "@/components/bpmnProcessDesigner/src/modules/auto-place/rewriteAutoPlace";
-import {save} from "@/api/bpmn/designer"
+import {save,readXml} from "@/api/bpmn/designer"
+import { getModel } from "../../api/bpmn/designer";
 
 export default {
   name: "BpmnEditor",
@@ -62,8 +62,6 @@ export default {
       pageMode: false,
       translationsSelf: translations,
       controlForm: {
-        processId: "",
-        processName: "",
         simulation: true,
         labelEditing: false,
         labelVisible: false,
@@ -88,6 +86,10 @@ export default {
       },
       modelInfo: {}
     };
+  },
+  created(){
+    const id = this.$route.query && this.$route.query.id;
+    this.getModelInfo(id);
   },
   methods: {
     initModeler(modeler) {
@@ -160,6 +162,14 @@ export default {
           console.log(res);
         })
       }
+    },
+    async getModelInfo(modelId){
+      const modelRes = await getModel(modelId)
+      const xmlStr = await readXml(modelId)
+      this.modelInfo = {
+        ...modelRes
+      }
+      this.xmlString = xmlStr
     }
   }
 }

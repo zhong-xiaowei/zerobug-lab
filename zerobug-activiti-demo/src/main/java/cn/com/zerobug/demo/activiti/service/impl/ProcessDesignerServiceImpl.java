@@ -2,9 +2,10 @@ package cn.com.zerobug.demo.activiti.service.impl;
 
 import cn.com.zerobug.demo.activiti.extend.cmd.SaveModelDesignerCommand;
 import cn.com.zerobug.demo.activiti.service.ProcessDesignerService;
-import cn.com.zerobug.demo.activiti.vo.ProcessModelSaveReqVo;
+import cn.com.zerobug.demo.activiti.vo.request.ProcessModelSaveRequestVo;
 import org.activiti.engine.ManagementService;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.repository.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,8 +25,8 @@ public class ProcessDesignerServiceImpl implements ProcessDesignerService {
     protected RepositoryService repositoryService;
 
     @Override
-    public void saveModelXml(ProcessModelSaveReqVo processModelSaveReqVo) {
-        managementService.executeCommand(new SaveModelDesignerCommand(processModelSaveReqVo.getId(), processModelSaveReqVo.getXmlStr()));
+    public void saveModelXml(ProcessModelSaveRequestVo processModelSaveRequestVo) {
+        managementService.executeCommand(new SaveModelDesignerCommand(processModelSaveRequestVo.getId(), processModelSaveRequestVo.getXmlStr()));
     }
 
     @Override

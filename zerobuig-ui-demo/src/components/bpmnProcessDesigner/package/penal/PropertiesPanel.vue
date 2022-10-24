@@ -3,7 +3,7 @@
     <el-collapse v-model="activeTab">
       <el-collapse-item name="base">
         <div slot="title" class="panel-tab__title"><i class="el-icon-info"></i>常规</div>
-        <element-base-info :id-edit-disabled="idEditDisabled" :business-object="elementBusinessObject" :type="elementType" />
+        <element-base-info :id-edit-disabled="idEditDisabled" :business-object="elementBusinessObject" :type="elementType" :modelInfo="modelInfo"/>
       </el-collapse-item>
       <el-collapse-item name="condition" v-if="elementType === 'Process'" key="message">
         <div slot="title" class="panel-tab__title"><i class="el-icon-s-comment"></i>消息与信号</div>
@@ -76,7 +76,7 @@ export default {
     bpmnModeler: Object,
     prefix: {
       type: String,
-      default: "camunda"
+      default: "activiti"
     },
     width: {
       type: Number,
@@ -85,7 +85,8 @@ export default {
     idEditDisabled: {
       type: Boolean,
       default: false
-    }
+    },
+    modelInfo: Object
   },
   provide() {
     return {
